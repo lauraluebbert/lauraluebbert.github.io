@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=16">
   <style>html { visibility: hidden; }</style>
 </head>
 <body>
@@ -65,7 +65,11 @@
           </p>
         </div>
 
-        <div class="gallery-section fade-in">
+        <div class="adventures-map-container fade-in">
+          <div id="adventures-map"></div>
+        </div>
+
+        <div class="gallery-section fade-in" id="section-hiking">
           <h3>National Parks &amp; Hiking</h3>
           <div class="gallery-grid">
             <div class="gallery-item scale-in stagger-1">
@@ -251,7 +255,7 @@
           </div>
         </div>
 
-        <div class="gallery-section fade-in">
+        <div class="gallery-section fade-in" id="section-diving">
           <h3>Scuba Diving</h3>
           <div class="gallery-grid">
             <div class="gallery-item scale-in stagger-1">
@@ -593,7 +597,7 @@
           </div>
         </div>
 
-        <div class="gallery-section fade-in">
+        <div class="gallery-section fade-in" id="section-catalonia">
           <h3>Catalonia</h3>
           <div class="gallery-grid">
             <div class="gallery-item scale-in stagger-1">
@@ -671,7 +675,7 @@
           </div>
         </div>
 
-        <div class="gallery-section fade-in">
+        <div class="gallery-section fade-in" id="section-bayarea">
           <h3>Bay Area</h3>
           <div class="gallery-grid">
             <div class="gallery-item scale-in stagger-1">
@@ -731,5 +735,63 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <script src="https://unpkg.com/globe.gl@2.27.0/dist/globe.gl.min.js"></script>
+  <script>
+    // Initialize Adventures Globe
+    document.addEventListener('DOMContentLoaded', function() {
+      const container = document.getElementById('adventures-map');
+
+      // Adventure locations
+      const locations = [
+        { lat: 37.746, lng: -119.533, name: 'Yosemite / Half Dome', section: 'section-hiking', color: '#8b5cf6' },
+        { lat: 36.887, lng: -118.555, name: 'Kings Canyon', section: 'section-hiking', color: '#8b5cf6' },
+        { lat: 36.486, lng: -118.565, name: 'Sequoia', section: 'section-hiking', color: '#8b5cf6' },
+        { lat: 37.298, lng: -113.026, name: 'Zion', section: 'section-hiking', color: '#8b5cf6' },
+        { lat: 36.758, lng: -118.212, name: 'Inyo National Forest', section: 'section-hiking', color: '#8b5cf6' },
+        { lat: 33.082, lng: -116.302, name: 'Anza-Borrego', section: 'section-hiking', color: '#8b5cf6' },
+        { lat: 29.012, lng: -82.685, name: 'Florida Springs', section: 'section-diving', color: '#6d28d9' },
+        { lat: 26.528, lng: -80.052, name: 'Boynton Beach', section: 'section-diving', color: '#6d28d9' },
+        { lat: 26.635, lng: -80.037, name: 'Goliath Groupers', section: 'section-diving', color: '#6d28d9' },
+        { lat: 33.394, lng: -118.416, name: 'Catalina Island', section: 'section-diving', color: '#6d28d9' },
+        { lat: 42.319, lng: 1.536, name: 'Catalan Pyrenees', section: 'section-catalonia', color: '#a78bfa' },
+        { lat: 41.119, lng: 1.245, name: 'Tarragona', section: 'section-catalonia', color: '#a78bfa' },
+        { lat: 37.774, lng: -122.419, name: 'Bay Area', section: 'section-bayarea', color: '#7c3aed' }
+      ];
+
+      const globe = Globe()
+        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+        .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+        .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+        .pointsData(locations)
+        .pointLat('lat')
+        .pointLng('lng')
+        .pointColor('color')
+        .pointAltitude(0.02)
+        .pointRadius(0.8)
+        .pointLabel(d => `<div class="globe-tooltip"><strong>${d.name}</strong><br><span>Click to view photos</span></div>`)
+        .onPointClick(d => {
+          const target = document.getElementById(d.section);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        })
+        .width(container.offsetWidth)
+        .height(400)
+        (container);
+
+      // Auto-rotate
+      globe.controls().autoRotate = true;
+      globe.controls().autoRotateSpeed = 0.2;
+      globe.controls().enableZoom = false;
+
+      // Set initial view - more zoomed in
+      globe.pointOfView({ lat: 35, lng: -40, altitude: 1.5 });
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        globe.width(container.offsetWidth);
+      });
+    });
+  </script>
 </body>
 </html>

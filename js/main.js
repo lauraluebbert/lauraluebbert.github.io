@@ -6,6 +6,159 @@
 
 document.addEventListener('DOMContentLoaded', function() {
 
+  // ============================================
+  // DNA HELIX LOADING ANIMATION (slow connections only)
+  // ============================================
+  const dnaLoader = document.querySelector('.dna-loader');
+  if (dnaLoader) {
+    // Check connection speed - only show loader on slow connections
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const isSlowConnection = connection &&
+      (connection.effectiveType === 'slow-2g' ||
+       connection.effectiveType === '2g' ||
+       connection.effectiveType === '3g');
+
+    if (isSlowConnection) {
+      // Show loader and hide when page is ready
+      window.addEventListener('load', () => {
+        dnaLoader.classList.add('hidden');
+      });
+    } else {
+      // Fast connection - hide loader immediately
+      dnaLoader.classList.add('hidden');
+    }
+  }
+
+  // ============================================
+  // CUSTOM CURSOR - PERSON CHASED BY VIRUS
+  // ============================================
+  const cursorPerson = document.createElement('div');
+  cursorPerson.className = 'cursor-person';
+  cursorPerson.textContent = '🏃';
+  document.body.appendChild(cursorPerson);
+
+  const cursorVirus = document.createElement('div');
+  cursorVirus.className = 'cursor-virus';
+  cursorVirus.textContent = '🦠';
+  document.body.appendChild(cursorVirus);
+
+  // Toggle button
+  const virusToggle = document.createElement('button');
+  virusToggle.className = 'virus-toggle';
+  virusToggle.innerHTML = '🦠 Virus Mode';
+  document.body.appendChild(virusToggle);
+
+  let virusCursorEnabled = false;
+  let mouseX = -100, mouseY = -100;
+  let virusX = -100, virusY = -100;
+  let cursorVisible = false;
+  let isMoving = false;
+  let moveTimeout;
+  let sicknessLevel = 0;
+  let lastDirection = 1;
+
+  const sickStates = ['🧍', '😰', '🤢', '🤮', '😵', '💀'];
+
+  virusToggle.addEventListener('click', () => {
+    virusCursorEnabled = !virusCursorEnabled;
+    document.body.classList.toggle('virus-cursor-active', virusCursorEnabled);
+    virusToggle.classList.toggle('active', virusCursorEnabled);
+    virusToggle.innerHTML = virusCursorEnabled ? '🦠 Disable Virus' : '🦠 Virus Mode';
+
+    if (!virusCursorEnabled) {
+      cursorPerson.classList.remove('cursor-visible');
+      cursorVirus.classList.remove('cursor-visible');
+      cursorVisible = false;
+      sicknessLevel = 0;
+    }
+  });
+
+  function updatePersonState() {
+    if (!virusCursorEnabled) return;
+
+    const distance = Math.sqrt(Math.pow(mouseX - virusX, 2) + Math.pow(mouseY - virusY, 2));
+
+    if (isMoving) {
+      // Reset completely when moving
+      sicknessLevel = 0;
+      cursorPerson.textContent = '🏃';
+    } else {
+      // Only get sick when virus is very close (touching)
+      if (distance < 15) {
+        // Faster progression for first stage, slower for later stages
+        const rate = sicknessLevel < 1 ? 0.025 : 0.008;
+        sicknessLevel = Math.min(sickStates.length - 1, sicknessLevel + rate);
+      } else if (distance < 25) {
+        const rate = sicknessLevel < 1 ? 0.015 : 0.003;
+        sicknessLevel = Math.min(sickStates.length - 1, sicknessLevel + rate);
+      }
+
+      // Update appearance based on sickness
+      const sickIndex = Math.min(Math.floor(sicknessLevel), sickStates.length - 1);
+      cursorPerson.textContent = sickStates[sickIndex];
+    }
+  }
+
+  document.addEventListener('mousemove', (e) => {
+    if (!virusCursorEnabled) return;
+
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    isMoving = true;
+
+    // Reset move timeout
+    clearTimeout(moveTimeout);
+    moveTimeout = setTimeout(() => {
+      isMoving = false;
+    }, 100);
+
+    if (!cursorVisible) {
+      cursorVisible = true;
+      cursorPerson.classList.add('cursor-visible');
+      cursorVirus.classList.add('cursor-visible');
+      virusX = mouseX - 50;
+      virusY = mouseY;
+    }
+
+    // Person follows cursor immediately
+    cursorPerson.style.left = mouseX + 'px';
+    cursorPerson.style.top = mouseY + 'px';
+
+    // Flip person based on movement direction
+    if (e.movementX < 0) {
+      lastDirection = -1;
+      cursorPerson.style.transform = 'scaleX(-1)';
+    } else if (e.movementX > 0) {
+      lastDirection = 1;
+      cursorPerson.style.transform = 'scaleX(1)';
+    }
+  });
+
+  // Virus follows with delay - faster when mouse is still
+  function animateVirus() {
+    if (virusCursorEnabled) {
+      const speed = isMoving ? 0.08 : 0.15;
+      const targetOffset = isMoving ? 50 : 10;
+
+      virusX += (mouseX - targetOffset * lastDirection - virusX) * speed;
+      virusY += (mouseY - virusY) * speed;
+
+      cursorVirus.style.left = virusX + 'px';
+      cursorVirus.style.top = virusY + 'px';
+
+      updatePersonState();
+    }
+    requestAnimationFrame(animateVirus);
+  }
+  animateVirus();
+
+  // Hide cursors when mouse leaves window
+  document.addEventListener('mouseleave', () => {
+    if (!virusCursorEnabled) return;
+    cursorPerson.classList.remove('cursor-visible');
+    cursorVirus.classList.remove('cursor-visible');
+    cursorVisible = false;
+  });
 
   // ============================================
   // SCROLL PROGRESS BAR
@@ -102,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const typingElement = document.querySelector('.typing-text');
 
   if (typingElement) {
-    const words = ['welcome!', 'willkommen!', 'benvinguts!', 'bienvenidos!'];
+    const words = ['welcome!', 'willkommen!', 'benvinguts!'];
     let wordIndex = 0;
     let charIndex = 0;
     let isDeleting = false;
