@@ -696,15 +696,6 @@ document.addEventListener('DOMContentLoaded', function() {
       img.addEventListener('click', () => {
         researchLightboxImg.src = img.src;
         researchLightboxCaption.textContent = img.dataset.caption || img.alt;
-
-        // Apply color fill animation for gget user map
-        researchLightboxImg.classList.remove('color-fill-animate');
-        if (img.src.includes('gget_user_map')) {
-          // Force reflow to restart animation
-          void researchLightboxImg.offsetWidth;
-          researchLightboxImg.classList.add('color-fill-animate');
-        }
-
         researchLightbox.classList.add('active');
         document.body.style.overflow = 'hidden';
       });
@@ -712,7 +703,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function closeResearchLightbox() {
       researchLightbox.classList.remove('active');
-      researchLightboxImg.classList.remove('color-fill-animate');
       document.body.style.overflow = '';
     }
 

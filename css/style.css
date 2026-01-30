@@ -1654,21 +1654,6 @@ nav ul {
 .lightbox-prev { left: 2rem; }
 .lightbox-next { right: 2rem; }
 
-/* Color fill animation for gget user map */
-.lightbox-content img.color-fill-animate {
-  filter: grayscale(100%) brightness(1.1);
-  animation: colorFillIn 2.5s ease-out forwards;
-}
-
-@keyframes colorFillIn {
-  0% {
-    filter: grayscale(100%) brightness(1.1);
-  }
-  100% {
-    filter: grayscale(0%) brightness(1);
-  }
-}
-
 /* My Roots Styles */
 .roots-intro {
   max-width: 800px;
