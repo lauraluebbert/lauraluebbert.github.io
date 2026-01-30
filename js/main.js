@@ -7,6 +7,22 @@
 document.addEventListener('DOMContentLoaded', function() {
 
   // ============================================
+  // IMAGE PROTECTION - Disable right-click on images
+  // ============================================
+  document.addEventListener('contextmenu', function(e) {
+    if (e.target.tagName === 'IMG') {
+      e.preventDefault();
+    }
+  });
+
+  // Disable drag on images
+  document.addEventListener('dragstart', function(e) {
+    if (e.target.tagName === 'IMG') {
+      e.preventDefault();
+    }
+  });
+
+  // ============================================
   // DNA HELIX LOADING ANIMATION (slow connections only)
   // ============================================
   const dnaLoader = document.querySelector('.dna-loader');

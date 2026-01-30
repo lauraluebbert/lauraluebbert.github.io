@@ -1,0 +1,28 @@
+# robots.txt for lauraluebbert.com
+
+User-agent: *
+Allow: /home
+Allow: /research
+Allow: /resume
+Allow: /contact
+
+# Discourage indexing of personal pages
+Disallow: /my-roots
+Disallow: /adventures
+Disallow: /thank-you
+
+# Block common bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# Sitemap
+Sitemap: https://lauraluebbert.com/sitemap.xml
